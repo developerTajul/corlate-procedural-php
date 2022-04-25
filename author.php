@@ -1,29 +1,17 @@
 <?php require_once('header.php'); 
-$limit = 4;
-$offset = 0;
 
-if( isset( $_GET['post-page']) ){
-    $page_number = $_GET['post-page'] - 1;
-    $offset = $limit * $page_number;
+if( isset( $_GET['userid'] )){
+    $current_id = $_GET['userid'];
+
+    $author_posts = "SELECT * FROM posts 
+    INNER JOIN users ON posts.author_id = users.user_id
+    INNER JOIN categories ON posts.category_id = categories.cat_id    
+    WHERE author_id= $current_id ORDER BY posts.post_id DESC";
+
+    $result = mysqli_query( $con, $author_posts);
+    $author_posts = mysqli_fetch_all( $result, MYSQLI_ASSOC );
 }
-
-$post_sql = "SELECT * FROM posts
-INNER JOIN users ON posts.author_id = users.user_id
-INNER JOIN categories ON posts.category_id = categories.cat_id
-ORDER BY posts.post_id DESC LIMIT $limit OFFSET $offset
-";
-
-$posts_query = mysqli_query($con, $post_sql );
-$all_posts = mysqli_fetch_all($posts_query, MYSQLI_ASSOC);
-
-
-$post_count_query = mysqli_query($con, "SELECT * FROM posts");
-$post_numbs = $post_count_query->num_rows;
-$page_start = 1;
-$total_page = ceil($post_numbs / $limit);
 ?>
-
-
 
 
 <section id="blog" class="container">
@@ -37,7 +25,7 @@ $total_page = ceil($post_numbs / $limit);
         <div class="row">
             <div class="col-md-8">
                 <?php 
-                foreach( $all_posts as $key => $value ):?>
+                foreach( $author_posts as $key => $value ):?>
                     <div class="blog-item">
                         <div class="row">
                             <div class="col-xs-12 col-sm-2 text-center">
